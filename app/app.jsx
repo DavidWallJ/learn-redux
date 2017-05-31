@@ -12,3 +12,6 @@ ReactDOM.render(
   <p>Biolerplate 3 Project</p>,
   document.getElementById('app')
 );
+
+// require('./redux-examples');
+require('./redux-todo-example');
