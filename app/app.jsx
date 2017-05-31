@@ -8,10 +8,10 @@ $(document).foundation();
 // App css
 require('style!css!sass!applicationStyles')
 
-ReactDOM.render(
-  <p>Biolerplate 3 Project</p>,
-  document.getElementById('app')
-);
+// ReactDOM.render(
+//   <p>Biolerplate 3 Project</p>,
+//   document.getElementById('app')
+// );
 
 // require('./redux-examples');
 require('./redux-todo-example');

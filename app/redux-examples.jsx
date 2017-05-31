@@ -20,15 +20,31 @@ const reducer = (state = {name: 'Anonymous'}, action) => {
   }
 };
 
-const store = redux.createStore(reducer);
+const store = redux.createStore(reducer, redux.compose(
+  window.devToolsExtension ? window.devToolsExtension() : f => f
+));
+// the redux.compose is just added on to allow you to use the chrome devTools
+
+
+// subscribe to changes
+const unsubscribe = store.subscribe(() => {
+  const state = store.getState();
+  console.log('Name is', state.name);
+  document.getElementById('app').innerHTML = state.name;
+});
+
+// unsubscribe();
+// you can turn off the subscribe using this
 
 const currentState = store.getState();
-
-console.log('current state: ', currentState);
+console.log('default state: ', currentState);
 
 store.dispatch({
   type: 'CHANGE_NAME',
   name: 'David J'
 });
 
-console.log('Name should be david', store.getState());
+store.dispatch({
+  type: 'CHANGE_NAME',
+  name: 'Johnny'
+});
