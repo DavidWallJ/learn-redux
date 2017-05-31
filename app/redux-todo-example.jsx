@@ -13,9 +13,24 @@ const stateDefault = {
 
 const reducer = (state = stateDefault, action) => {
 
-  return state
+  switch (action.type) {
+    case 'CHANGE_SEARCH_TEXT':
+      return {
+        ...state,
+        searchText: action.searchText
+      };
+    default:
+      return state;
+  }
 }
 
 const store = redux.createStore(reducer)
 
-console.log('current state: ', store.getState());
+console.log('default state: ', store.getState());
+
+store.dispatch({
+  type: 'CHANGE_SEARCH_TEXT',
+  searchText: 'Sup!'
+});
+
+console.log('searchText should be Sup!', store.getState());
