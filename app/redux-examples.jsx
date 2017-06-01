@@ -7,6 +7,7 @@
 
 
 const redux = require('redux');
+import axios from 'axios';
 
 console.log('Starting redux example');
 
@@ -107,10 +108,55 @@ const removeMovie = (id) => {
   }
 };
 
+// Map reducer and action generators
+// ---------------
+const mapReducer = (state = {isFetching: false, url: undefined}, action) => {
+  switch (action.type) {
+    case 'START_LOCATION_FETCH':
+      return {
+        isFetching: true,
+        url: undefined
+      };
+    case 'COMPLETE_LOCATION_FETCH':
+      return {
+        isFetching: false,
+        url: action.url
+      };
+    default:
+      return state;
+  }
+};
+
+const startLocationFetch = () => {
+    return {
+      type: 'START_LOCATION_FETCH'
+    };
+};
+
+const completeLocationFetch = (url) => {
+    return {
+      type: 'COMPLETE_LOCATION_FETCH',
+      url
+    };
+};
+
+const fetchLocation = () => {
+    store.dispatch(startLocationFetch());
+
+    axios.get('http://ipinfo.io').then((res) => {
+      // axios has been included in this project
+      const loc = res.data.loc;
+      const baseUrl = 'http://maps.google.com?q=';
+
+      store.dispatch(completeLocationFetch(baseUrl + loc));
+    });
+};
+
 const reducer = redux.combineReducers({
   name: nameReducer,
   hobbies: hobbiesReducer,
-  movies: moviesReducer
+  movies: moviesReducer,
+  map: mapReducer
 })
 
 const store = redux.createStore(reducer, redux.compose(
@@ -122,10 +168,17 @@ const store = redux.createStore(reducer, redux.compose(
 // subscribe to changes
 const unsubscribe = store.subscribe(() => {
   const state = store.getState();
-  document.getElementById('app').innerHTML = state.name;
+
+  if(state.map.isFetching) {
+    document.getElementById('app').innerHTML = 'Loading...';
+  } else if (state.map.url) {
+    document.getElementById('app').innerHTML = '<a target="_blank" href="' + state.map.url + '">View Your Location</a>'
+  }
 
   console.log('new state: ', store.getState());
 });
+
+fetchLocation();
 
 // unsubscribe();
 // you can turn off the subscribe using this
