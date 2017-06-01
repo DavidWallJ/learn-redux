@@ -15,61 +15,64 @@ const stateDefault = {
   hobbies: [],
   movies: []
 };
+
 let nextHobbyId = 1;
 let nextMovieId = 1;
-const reducer = (state = stateDefault, action) => {
-  // state = state || {name: 'Anonymous'};
-  // same as above
 
+const nameReducer = (state = 'Anonymous', action) => {
   switch (action.type) {
     case 'CHANGE_NAME':
-      return {
-        ...state,
-        name: action.name
-      };
+      return action.name;
+    default:
+      return state;
+  }
+}
+
+const hobbiesReducer = (state = [], action) => {
+  // state = state || [];
+  // es6 set default
+  switch (action.type) {
     case 'ADD_HOBBY':
-      return {
+      return [
         ...state,
-        hobbies: [
-          ...state.hobbies,
-          {
-            id: nextHobbyId++,
-            // by putting the ++ after the var it the next use is one higher
-            // by putting the ++ before the var the id is one higher for this use
-            hobby: action.hobby
-          }
-        ]
-        // concat onto an array without updating the original
-      };
+        {
+          id: nextHobbyId++,
+          hobby: action.hobby
+        }
+      ];
+
     case 'REMOVE_HOBBY':
-      return{
-        ...state,
-        hobbies: state.hobbies.filter(hobby => hobby.id !== action.id)
-      }
-
-    case 'ADD_MOVIE':
-      return {
-        ...state,
-        movies: [
-          ...state.movies,
-          {
-            id: nextMovieId++,
-            movie: action.movie,
-            genre: action.genre
-          }
-        ]
-      }
-
-    case 'REMOVE_MOVIE':
-      return{
-        ...state,
-        movies: state.movies.filter(movie => movie.id !== action.id)
-      }
+      return state.filter(hobby => hobby.id !== action.id);
 
     default:
       return state;
   }
-};
+}
+
+const moviesReducer = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_MOVIE':
+      return [
+        ...state,
+        {
+          id: nextMovieId++,
+          hobby: action.movie
+        }
+      ];
+
+    case 'REMOVE_MOVIE':
+      return state.filter(movie => movie.id !== action.id);
+
+    default:
+      return state;
+  }
+}
+
+const reducer = redux.combineReducers({
+  name: nameReducer,
+  hobbies: hobbiesReducer,
+  movies: moviesReducer
+})
 
 const store = redux.createStore(reducer, redux.compose(
   window.devToolsExtension ? window.devToolsExtension() : f => f
@@ -80,7 +83,6 @@ const store = redux.createStore(reducer, redux.compose(
 // subscribe to changes
 const unsubscribe = store.subscribe(() => {
   const state = store.getState();
-  console.log('Name is', state.name);
   document.getElementById('app').innerHTML = state.name;
 
   console.log('new state: ', store.getState());
