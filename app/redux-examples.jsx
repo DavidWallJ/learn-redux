@@ -10,15 +10,9 @@ const redux = require('redux');
 
 console.log('Starting redux example');
 
-const stateDefault = {
-  name: 'Anonymous',
-  hobbies: [],
-  movies: []
-};
 
-let nextHobbyId = 1;
-let nextMovieId = 1;
-
+// Name reducer and action generators
+// ---------------
 const nameReducer = (state = 'Anonymous', action) => {
   switch (action.type) {
     case 'CHANGE_NAME':
@@ -26,8 +20,20 @@ const nameReducer = (state = 'Anonymous', action) => {
     default:
       return state;
   }
-}
+};
 
+// this is called an action generator.  It's really just a simple function
+const changeName = (name) => {
+  return {
+    type: 'CHANGE_NAME',
+    name
+    // same as name: name
+  }
+};
+
+// Hobbies reducer and action generators
+// ---------------
+let nextHobbyId = 1;
 const hobbiesReducer = (state = [], action) => {
   // state = state || [];
   // es6 set default
@@ -47,8 +53,25 @@ const hobbiesReducer = (state = [], action) => {
     default:
       return state;
   }
-}
+};
 
+const addHobby = (hobby) => {
+  return {
+    type: 'ADD_HOBBY',
+    hobby
+  }
+};
+
+const removeHobby = (id) => {
+  return {
+    type: 'REMOVE_HOBBY',
+    id
+  }
+};
+
+// Movies reducer and action generators
+// ---------------
+let nextMovieId = 1;
 const moviesReducer = (state = [], action) => {
   switch (action.type) {
     case 'ADD_MOVIE':
@@ -56,7 +79,8 @@ const moviesReducer = (state = [], action) => {
         ...state,
         {
           id: nextMovieId++,
-          hobby: action.movie
+          movie: action.movie,
+          genre: action.genre
         }
       ];
 
@@ -67,6 +91,21 @@ const moviesReducer = (state = [], action) => {
       return state;
   }
 }
+
+const addMovie = (movie, genre) => {
+  return {
+    type: 'ADD_MOVIE',
+    genre,
+    movie
+  }
+};
+
+const removeMovie = (id) => {
+  return {
+    type: 'REMOVE_MOVIE',
+    id
+  }
+};
 
 const reducer = redux.combineReducers({
   name: nameReducer,
@@ -94,45 +133,15 @@ const unsubscribe = store.subscribe(() => {
 const currentState = store.getState();
 console.log('default state: ', currentState);
 
-store.dispatch({
-  type: 'CHANGE_NAME',
-  name: 'David J'
-});
+store.dispatch(changeName('David J'));
 
-store.dispatch({
-  type: 'ADD_HOBBY',
-  hobby: 'Running'
-});
+store.dispatch(addHobby('laying down'));
+store.dispatch(addHobby('sitting'));
+store.dispatch(removeHobby(2));
 
-store.dispatch({
-  type: 'ADD_HOBBY',
-  hobby: 'Sitting'
-});
+store.dispatch(changeName('Johnny'));
 
-store.dispatch({
-  type: 'REMOVE_HOBBY',
-  id: 2
-});
-
-store.dispatch({
-  type: 'CHANGE_NAME',
-  name: 'Johnny'
-});
-
-store.dispatch({
-  type: 'ADD_MOVIE',
-  movie: 'Moon',
-  genre: 'Sci-fi'
-});
-
-store.dispatch({
-  type: 'ADD_MOVIE',
-  movie: 'Primer',
-  genre: 'Sci-fi'
-});
-
-store.dispatch({
-  type: 'REMOVE_MOVIE',
-  id: 2
-});
+store.dispatch(addMovie('Moon', 'Sci-fi'));
+store.dispatch(addMovie('Babe: Pig in the City', 'Documentary'));
+store.dispatch(removeMovie(1));
 
